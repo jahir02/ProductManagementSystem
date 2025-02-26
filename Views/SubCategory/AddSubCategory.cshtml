@@ -1,0 +1,65 @@
+﻿@model SubCategory
+@{
+    ViewData["Title"] = "Add SubCategory";
+}
+
+<div class="row text">
+    <div class="col-md-8 offset-2">
+        <h1 class="text-center">
+            Add SubCategory
+        </h1>
+        @if (ViewBag.Messagestatus==1){
+          
+
+            <div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> Subcategory has added successfully.
+            </div>
+        }
+        @if (ViewBag.Messagestatus == 2)
+        {
+           
+            <div class="alert alert-danger alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> Error in Saving.
+            </div>
+        }
+        
+        <div class="row">
+            <div class="col-md-8 offset-2">
+
+                <form asp-action="addsubCategory">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                   
+                    <div class="form-group">
+
+                        <label asp-for="CategoryId" class="control-label"></label>
+                        <select id="drpEmpList" class="form-control" asp-for="CategoryId" asp-items="@(new SelectList(ViewBag.categorylist, "Value", "Text"))">
+                            <option value="">--Select--</option>
+                        </select>
+                       @*  <input type="hidden" asp-for="Id" /> *@
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                    @* <div class="form-group"> *@
+                    @*     <label asp-for="Id" class="control-label"></label> *@
+                    @*     <input asp-for="Id" class="form-control" /> *@
+                    @*     <span asp-validation-for="Id" class="text-danger"></span> *@
+                    @* </div> *@
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="SubName" class="control-label"></label>
+                        <input asp-for="SubName" class="form-control" />
+                        <span asp-validation-for="SubName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group" style="padding-top: 6px;">
+                        <input type="submit" value="Create" class="btn btn-outline-success float-right" />
+
+                        <a class="btn btn-outline-secondary" asp-action="Index"> Show All</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

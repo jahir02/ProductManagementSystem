@@ -1,0 +1,92 @@
+﻿@model Product
+@{
+    ViewData["Title"] = "AddProduct";
+}
+
+<div class="row text">
+    <div class="col-md-8 offset-2">
+        <p>
+            <h1>
+                Add a New Product
+            </h1>
+        </p>
+        <div class="row">
+            <div class="col-md-8 offset-2">
+                <form asp-action="AddProduct">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group">
+                        <label asp-for="CategoryId" class="control-label"></label>
+                        <select asp-for="CategoryId" asp-items="ViewBag.CategoryList" onchange="getSubcategoryByCategoryId(this)" class="form-control"></select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="SubCategoryId" class="control-label"></label>
+                        <select asp-for="SubCategoryId"  class="form-control"></select>
+                        <span asp-validation-for="SubCategoryId" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ModelNo" class="control-label"></label>
+                        <input asp-for="ModelNo" class="form-control" />
+                        <span asp-validation-for="ModelNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Specification" class="control-label"></label>
+                        <input asp-for="Specification" class="form-control" />
+                        <span asp-validation-for="Specification" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Price" class="control-label"></label>
+                        <input asp-for="Price" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="form-group" style="padding-top: 6px;">
+                        <input type="submit" value="Create" class="btn btn-outline-success float-right" />
+
+                        <a class="btn btn-outline-secondary" asp-action="Index"> Show All</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+          function getSubcategoryByCategoryId (categoryid) {
+            
+            $.ajax({
+                url: "https://localhost:7004/Product/getsubcategorylist",
+                type: 'GET',
+                data: {
+                    categoryId: categoryid.value
+                },
+                success: function (data) {
+                    $("#SubCategoryId").find('option').remove();
+                    $(data).each(function (index, item) {
+                        $("#SubCategoryId").append('<option value="' + item.id + '">' + item.subName + '</option>');
+                    });
+                },
+                error: function (data) {
+               alert("error")
+               
+            }
+            });
+        };
+    </script>
+}

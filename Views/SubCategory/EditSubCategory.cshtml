@@ -1,0 +1,55 @@
+﻿@model SubCategory
+@{
+    ViewData["Title"] = "EditSubCategory";
+}
+
+
+<div class="row text">
+    <div class="col-md-8 offset-2">
+        <p>
+            <h1>
+                Update SubCategory
+            </h1>
+        </p>
+        <div class="row">
+            <div class="col-md-8 offset-2">
+                <form asp-action="EditSubCategory">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group text-center">
+                        <img id="ProfilePicturePreview" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Id" class="control-label"></label>
+                        <input asp-for="Id" disabled readonly class="form-control" />
+                        <span asp-validation-for="Id" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SubName" class="control-label"></label>
+                        <input asp-for="SubName" class="form-control" />
+                        <span asp-validation-for="SubName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CategoryId" class="control-label"></label>
+                        <input asp-for="CategoryId" class="form-control" />
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+
+                    @* <div class="form-group"> *@
+                    @*     <label asp-for="CategoryName" class="control-label"></label> *@
+                    @*     <input asp-for="Categoryname" class="form-control" /> *@
+                    @*     <span asp-validation-for="CategoryName" class="text-danger"></span> *@
+                    @* </div> *@
+                  
+
+
+                    <input type="submit" value="Update" class="btn btn-outline-success float-right" />
+
+                    <a class="btn btn-outline-secondary" asp-action="Index"> Show All</a>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+</div>

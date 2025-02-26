@@ -1,0 +1,34 @@
+﻿@model IEnumerable<SubcategoryViewModel>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Sub Category List</h1>
+<button class="btn btn-success btn-outline-success text-white-50"> <a asp-controller="SubCategory" asp-action="AddSubCategory" class="text-white"> Add SubCategory</a> </button>
+<table class="table">
+    <thead>
+        <tr class="text-center">
+            <th>@Html.DisplayNameFor(model => model.First().Id)</th>
+            <th>@Html.DisplayNameFor(model => model.First().SubName)</th>
+            <th>@Html.DisplayNameFor(model => model.First().CategoryId)</th>
+            <th>@Html.DisplayNameFor(model => model.First().CategoryName)</th>
+            <th style="text-align: left;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="align-middle">@item.Id</td>
+                <td class="align-middle">@item.SubName</td>
+                <td class="align-middle">@item.CategoryId</td>
+                <td class="align-middle">@item.CategoryName</td>
+                <td class="align-middle">
+                    <a class="btn btn-outline-primary" asp-action="EditSubCategory" asp-route-id="@item.Id"> <i class="bi bi-pencil-square"></i> Edit</a>|
+
+                    <a class="btn btn-danger text-white" asp-action="DeletSubCategory" asp-route-id="@item.Id"> <i class="bi bi-trash"></i> Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

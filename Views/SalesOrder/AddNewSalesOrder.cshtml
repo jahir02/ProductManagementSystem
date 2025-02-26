@@ -1,0 +1,365 @@
+﻿@model SalesOrderViewModel
+@{
+	ViewData["Title"] = "AddNewSalesOrder";
+}
+
+<h1>Sales Order </h1>
+
+<div class="shadow p-4 mb-4 bg-white">
+	<div class="row">
+		<div class="col-2">
+			<label class=" control-label "> <b>Party Name</b> </label>
+
+		</div>
+		<div class="col-4">
+			<select id="drpUserId" asp-items="ViewBag.UserId" class="form-control"></select>
+		</div>
+		<div class="col-2">
+			<label class=" control-label"> <b>Order Date</b> </label>
+		</div>
+		<div class="col-2">
+			<input id="datepicker" class="form-control" placeholder="Select date" />
+
+		</div>
+		<div class="col-2">
+			<button class="btn btn-outline-success">Add Party</button>
+
+		</div>
+
+	</div>
+</div>
+<!-- Product Details Table -->
+
+<div class="shadow p-4 mb-4 bg-white">
+	<div style="max-height: 400px; overflow-y: auto; overflow-x: auto;">
+		<table id="sales-order-table" class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th>Category</th>
+					<th>SubCategory</th>
+					<th>Product Name</th>
+					<th>Model No</th>
+					<th>Specification</th>
+					<th>Price</th>
+					<th>MRP</th>
+					<th>Quantity</th>
+					<th>Amount</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="product-row-template d-none">
+					<td>
+						<select asp-for="CategoryId" class="form-control category-select" asp-items="ViewBag.CategoryList" onchange="getSubcategoryByCategoryId(this)">
+						</select>
+					</td>
+					<td>
+						<select asp-for="SubCategoryId" class="form-control subcategory-select" onchange="getProductsBySubcategoryId(this)">
+						</select>
+					</td>
+					<td>
+						<select asp-for="ProductId" class="form-control product-select" onchange="getProductDetails(this)">
+						</select>
+					</td>
+					<td><label class="model-no"></label></td>
+					<td><label class="specification"></label></td>
+					<td><label class="price"></label></td>
+					<td><input asp-for="MRP" type="text" class="form-control mrp-input" /></td>
+					<td><input type="text" asp-for="Quantity" class="form-control quantity-input" onchange="calculateAmount(this)" /></td>
+					<td><input type="text" asp-for="Amount" class="form-control amount-input" readonly /></td>
+					<td>
+						<button type="button" class="btn btn-danger remove-row">Remove</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<button type="button" class="btn btn-outline-primary" id="add-row">Add Row</button>
+	</div>
+</div>
+
+<!-- Summary Section -->
+<div class="shadow p-4 mb-4 bg-white">
+	<div class="row">
+		<div class="col-3">
+			Total CGST: <label class="control-label" asp-for="TotalSgst" id="total-cgst"></label>
+		</div>
+		<div class="col-3">
+			Total SGST: <label class="control-label" id="total-sgst" asp-for="TotalSgst"></label>
+		</div>
+		<div class="col-4">
+			Total Amount: <label class="control-label" asp-for="TotalAmount" id="total-amount"></label>
+		</div>
+		<div class="col-2">
+			<button type="submit" class="btn btn-outline-primary" id="saveData">Save</button>
+		</div>
+	</div>
+</div>
+
+<!-- JavaScript Section -->
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			// Initialize date picker
+			$('#datepicker').datepicker({
+				uiLibrary: 'bootstrap5',
+				format: 'mm/dd/yyyy',
+			});
+
+			// Add new row to the table
+			$('#add-row').click(function () {
+				var newRow = $('.product-row-template').clone();
+				newRow.removeClass('product-row-template d-none');
+				$('#sales-order-table tbody').append(newRow);
+			});
+
+			// Remove row
+			$(document).on('click', '.remove-row', function () {
+				$(this).closest('tr').remove();
+				updateSummary();
+			});
+		});
+
+
+		function getSubcategoryByCategoryId(categoryElement) {
+			var categoryId = $(categoryElement).val();
+			var subcategoryDropdown = $(categoryElement).closest('tr').find('.subcategory-select');
+
+			$.ajax({
+				url: "/Product/GetSubcategoryList",
+				type: 'GET',
+				data: { categoryId: categoryId },
+				success: function (data) {
+					 subcategoryDropdown.find('option').remove();
+					$.each(data, function (index, item) {
+
+						subcategoryDropdown.append('<option value="' + item.id + '">' + item.subName + '</option>');
+					});
+				},
+				error: function () {
+					alert("Error fetching subcategories.");
+				}
+			});
+		}
+
+
+		function getProductsBySubcategoryId(subcategoryElement) {
+			var subcategoryId = $(subcategoryElement).val();
+			var productDropdown = $(subcategoryElement).closest('tr').find('.product-select');
+			var categoryId = $(subcategoryElement).closest('tr').find('.category-select').val();
+
+			$.ajax({
+				url: "/Product/GetProductList",
+				type: 'GET',
+				data: { categoryId: categoryId,
+				subcategoryId: subcategoryId },
+				success: function (data) {
+					productDropdown.find('option').remove();
+					$.each(data, function (index, item) {
+
+						productDropdown.append('<option value="' + item.id + '">' + item.name + '</option>');
+					});
+				},
+				error: function () {
+					alert("Error fetching products.");
+				}
+			});
+		}
+
+
+		function getProductDetails(productElement) {
+			var productId = $(productElement).val();
+						 var categoryId = $(productElement).closest('tr').find('.category-select').val();
+									var subcategoryId = $(productElement).closest('tr').find('.subcategory-select').val();
+			var row = $(productElement).closest('tr');
+
+			$.ajax({
+				url: "/Product/GetProductDetails",
+				type: 'GET',
+								data: { categoryId:categoryId,subcategoryId:subcategoryId,productId: productId },
+				success: function (data) {
+					console.log(data);
+
+					row.find('.model-no').text(data.modelNo);
+					row.find('.specification').text(data.specification);
+					row.find('.price').text(data.price);
+				},
+				error: function () {
+					alert("Error fetching product details.");
+				}
+			});
+		}
+
+
+		// Calculate row amount and update summary
+		function calculateAmount(quantityInput) {
+			var row = $(quantityInput).closest('tr');
+			var price = parseFloat(row.find('.mrp-input').val()) || 0;
+			var quantity = parseFloat($(quantityInput).val()) || 0;
+			var amount = price * quantity;
+
+			row.find('.amount-input').val(amount.toFixed(2));
+			updateSummary();
+		}
+
+		// Update summary totals
+		function updateSummary() {
+			var totalAmount = 0;
+
+			$('#sales-order-table tbody tr').not('.product-row-template').each(function () {
+				var amount = parseFloat($(this).find('.amount-input').val()) || 0;
+				totalAmount += amount;
+			});
+
+			var gst = totalAmount * 0.18; // 18% GST
+			$('#total-cgst').text((gst / 2).toFixed(2));
+			$('#total-sgst').text((gst / 2).toFixed(2));
+			$('#total-amount').text(totalAmount.toFixed(2));
+		 }
+
+		//new test
+		// 	 $('#saveData').click(function () {
+		// 	// Collect data from inputs
+		// 	let dataList = [];
+		// 	$('#sales-order-table tbody tr').each(function () {
+		// 		const categoryId = $(this).find('.category-select').val();
+		// 		const subcateid = $(this).find('.subcategory-select').val();
+		// 		const producid = $(this).find('.product-select').val();
+		// 		const modelNo = $(this).find('.model-no-input').val();
+		// 		const specification = $(this).find('.specification-input').val();
+		// 		const price = $(this).find('.price-input').val();
+		// 		const mrp = $(this).find('.mrp-input').val();
+		// 		const quantity = $(this).find('.quantity-input').val();
+		// 		const amount = $(this).find('.amount-input').val();
+
+		// 		const userid = $('#drpUserId').val();
+		// 		const salesdate = $('#datepicker').val();
+
+
+		// 		if (
+		// 			categoryId && subcateid && producid &&
+		// 			userid && salesdate &&
+		// 			mrp && quantity && amount
+		// 		) {
+		// 			// Construct the row object
+		// 			const rowObject = {
+		// 				headerId: 0,
+		// 				userId: userid,
+		// 				salesType: "",
+		// 				salesDate: salesdate,
+		// 				totalAmount: 0,
+		// 				totalGst: 0,
+		// 				totalIgst: 0,
+		// 				totalSgst: 0,
+		// 				salesHeaderId: 0,
+		// 				salesOrderDetailsId: 0,
+		// 				productId: producid,
+		// 				quantity: quantity,
+		// 				amount: amount,
+		// 				gst: 0,
+		// 				cgst: 0,
+		// 				igst: 0,
+		// 				categoryId: categoryId,
+		// 				mrp: mrp,
+		// 				categoryName: "",
+		// 				subCategoryId: subcateid,
+		// 				subCategoryName: ""
+		// 			};
+
+		// 			dataList.push(rowObject); // Add row object to the list
+		// 		}
+		// 	});
+
+		// 	console.log(dataList); // Log the collected data
+
+
+
+		// 	 //  Send data via AJAX
+		// 		$.ajax({
+		// 			url: '/SalesOrder/AddNewSalesOrder', // Controller endpoint
+		// 			type: 'POST',
+		// 			contentType: 'application/json',
+		// 			data: JSON.stringify(dataList),
+		// 			success: function (response) {
+		// 				alert(response.message);
+		// 			},
+		// 			error: function (err) {
+		// 				console.error(err);
+		// 				alert('An error occurred.');
+		// 			}
+		// 		});
+		// });
+
+		// new test
+
+				$('#saveData').click(function () {
+			let dataList = [];
+
+			$('#sales-order-table tbody tr').not('.product-row-template').each(function () {
+				const categoryId = $(this).find('.category-select').val();
+				const subCategoryId = $(this).find('.subcategory-select').val();
+				const productId = $(this).find('.product-select').val();
+				const quantity = $(this).find('.quantity-input').val();
+				const amount = $(this).find('.amount-input').val();
+				const mrp = $(this).find('.mrp-input').val();
+
+				const userId = $('#drpUserId').val();
+
+				  const [month, day, year] = $('#datepicker').val().split('/');
+				const dateObject = new Date(`${year}-${month}-${day}`);
+				const salesDate = `${dateObject.toISOString().split('T')[0]}T10:30:00`;
+				const totalcgst=$('#total-cgst').text();
+				const totalsgst=$('#total-sgst').text();
+				const totalAmount=$('#total-amount').text();
+
+				if (categoryId && subCategoryId && productId && quantity && amount && mrp && userId && salesDate) {
+					dataList.push({
+						headerId: 0,
+						userId: userId,
+						salesType: "Online",
+						salesDate: salesDate,
+						totalAmount: Math.floor(totalAmount),
+						totalGst:  Math.floor(totalcgst),
+						totalIgst:  Math.floor(totalsgst),
+						totalSgst: Math.floor(totalsgst),
+						salesHeaderId: 0,
+						salesOrderDetailsId: 0,
+						productId: productId,
+						quantity: quantity,
+						amount: Math.floor(amount),
+						gst: 0,
+						cgst: 0,
+						igst: 0,
+						categoryId: categoryId,
+						mrp: mrp,
+						categoryName: " ",
+						subCategoryId: subCategoryId,
+						subCategoryName: " "
+					});
+				}
+			});
+			//console.log(dataList);
+			$.ajax({
+				url: '/SalesOrder/AddNewSalesOrder',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify(dataList),
+				success: function (response) {
+					alert('data save sucessfully');
+					window.location.href = '/SalesOrder/Index';
+				},
+				error: function (err) {
+					console.error(err);
+					alert('Failed to save the sales order.');
+				}
+			});
+		});
+
+
+
+
+	</script>
+}
+
+
+
+

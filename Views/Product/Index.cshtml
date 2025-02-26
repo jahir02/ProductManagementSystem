@@ -1,0 +1,65 @@
+﻿@model IEnumerable<ProductViewModel>
+@{
+	ViewData["Title"] = "Index";
+}
+<button class="btn btn-success btn-outline-success text-white-50"> <a asp-controller="Product" asp-action="AddProduct" class="text-white"> Add Product</a> </button>
+<div class="row">
+	<div class="col-12">
+		<h1>Product List</h1>
+		<table class="table">
+			<thead>
+				<tr class="text-center">
+					<th>
+						@Html.DisplayNameFor(model => model.Id)
+					</th>
+					<th>@Html.DisplayNameFor(model => model.Name)</th>
+					<th>@Html.DisplayNameFor(model => model.ModelNo)</th>
+					<th>@Html.DisplayNameFor(model => model.Specification)</th>
+					<th>@Html.DisplayNameFor(model => model.Price)</th>
+					<th>@Html.DisplayNameFor(model => model.CategoryName)</th>
+					<th>@Html.DisplayNameFor(model => model.SubCategoryId)</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model)
+				{
+					<tr>
+						<td class="align-middle">
+							@item.Id
+						</td>
+						<td class="align-middle">
+							@item.Name
+						</td>
+						<td class="align-middle">
+							@item.ModelNo
+						</td>
+						<td class="align-middle">
+							@item.Specification
+						</td>
+						<td class="align-middle">
+							@item.Price
+						</td>
+						<td class="align-middle">
+							@item.CategoryName
+						</td>
+						<td class="align-middle">
+							@item.SubCategoryId
+						</td>
+						<td class="align-middle">
+							<a class="btn btn-outline-primary" asp-action="EditProduct" asp-route-id="@item.Id"> <i class="bi bi-pencil-square"></i> Edit</a>|
+
+							<a class="btn btn-danger text-white" asp-action="DeleteProduct" asp-route-id="@item.Id"> <i class="bi bi-trash"></i> Delete</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+
+
+
+
